@@ -1,0 +1,6 @@
+{
+  "label": "ECU Instrumenter",
+  "icon": "/mnt/SDCARD/App/ECUInstrumenter/icon.png",
+  "launch": "launch.sh",
+  "description": "Monitor your car"
+}
