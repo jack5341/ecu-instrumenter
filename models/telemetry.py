@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class TelemetryFrame:
     def __init__(self, rpm=850.0, speed=0.0, throttle=0.0, afr=14.7, coolant=40.0, dtcs=None, phase_name="Idle"):
         self.rpm = rpm

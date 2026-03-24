@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pygame
 
 def mono_font(size, bold=False):

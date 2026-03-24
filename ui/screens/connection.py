@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pygame
 from core.state import global_state, AppScreen
 from core.obd_client import obd_client

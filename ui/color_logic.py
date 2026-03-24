@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from config import settings as C
 
 def afr_zone_color(afr):

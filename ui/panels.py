@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import division
 import pygame
 
@@ -105,7 +107,7 @@ def draw_dtc_panel(screen, dtcs, y, fonts):
     rect = pygame.Rect(C.PAD, y, C.WIDTH - 2 * C.PAD, 40)
     if not dtcs:
         pygame.draw.rect(screen, C.GREEN, rect, 2)
-        msg = fonts.label.render("● NO FAULT CODES", True, C.GREEN)
+        msg = fonts.label.render("* NO FAULT CODES", True, C.GREEN)
         screen.blit(msg, (rect.centerx - msg.get_width() // 2, rect.centery - msg.get_height() // 2))
         return
 
