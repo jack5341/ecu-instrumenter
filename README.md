@@ -22,6 +22,14 @@ Launch the dashboard natively using PyGame on your laptop:
    make run
    ```
 
+## Development Checks
+
+Run quick quality checks before opening a PR:
+
+```bash
+make check
+```
+
 ## Deploying to Miyoo Mini Plus (OnionOS)
 
 This project connects to your Miyoo Mini Plus over Wi-Fi (SSH) to inject the application files directly into the correct SD Card folders! 

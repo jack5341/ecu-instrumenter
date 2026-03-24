@@ -6,7 +6,7 @@ echo ":: ECU INSTRUMENTER LAUNCH"
 echo --------------------------------------------------------------------
 
 AppDir=$(pwd)
-AppExecutable="ecu_dashboard.py"
+AppExecutable="app.py"
 Arguments="$@"
 PerformanceMode=1
 
