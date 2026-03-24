@@ -47,15 +47,15 @@ class GlobalState:
 
     def save(self):
         try:
-            with open("config.json", "w") as f:
+            with open("settings.json", "w") as f:
                 json.dump(self.settings.to_dict(), f)
         except:
             pass
             
     def load(self):
-        if os.path.exists("config.json"):
+        if os.path.exists("settings.json"):
             try:
-                with open("config.json", "r") as f:
+                with open("settings.json", "r") as f:
                     data = json.load(f)
                     self.settings = AppSettings(**data)
                     if self.settings.was_connected:
