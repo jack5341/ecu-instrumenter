@@ -1,12 +1,10 @@
-from __future__ import annotations
-
+from __future__ import division
 import math
 import random
 
 from models.telemetry import TelemetryFrame
 
-
-def _smoothstep(value: float) -> float:
+def _smoothstep(value):
     value = max(0.0, min(1.0, value))
     return value * value * (3.0 - 2.0 * value)
 
@@ -23,44 +21,44 @@ _PHASE_DURATION = 4.0
 
 
 class Simulator:
-    def __init__(self) -> None:
+    def __init__(self):
         self._t = 0.0
         self._coolant = 40.0
         self.frame = TelemetryFrame()
         random.seed()
 
     @property
-    def rpm(self) -> float:
+    def rpm(self):
         return self.frame.rpm
 
     @property
-    def speed(self) -> float:
+    def speed(self):
         return self.frame.speed
 
     @property
-    def throttle(self) -> float:
+    def throttle(self):
         return self.frame.throttle
 
     @property
-    def afr(self) -> float:
+    def afr(self):
         return self.frame.afr
 
     @property
-    def coolant(self) -> float:
+    def coolant(self):
         return self.frame.coolant
 
     @property
-    def dtcs(self) -> list[str]:
+    def dtcs(self):
         return self.frame.dtcs
 
     @property
-    def phase_name(self) -> str:
+    def phase_name(self):
         return self.frame.phase_name
 
-    def _phase_index(self) -> int:
+    def _phase_index(self):
         return int(self._t / _PHASE_DURATION) % 4
 
-    def _lerp_phase_values(self) -> tuple[float, float, float, float, float]:
+    def _lerp_phase_values(self):
         cycle_t = self._t % (4.0 * _PHASE_DURATION)
         seg = cycle_t / _PHASE_DURATION
         i0 = int(seg) % 4
@@ -76,7 +74,7 @@ class Simulator:
         coolant_target = start[4] + (end[4] - start[4]) * ratio
         return rpm, speed, throttle, base_afr, coolant_target
 
-    def update(self, dt: float) -> TelemetryFrame:
+    def update(self, dt):
         if dt <= 0:
             dt = 1.0 / 30.0
         self._t += dt

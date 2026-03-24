@@ -1,41 +1,63 @@
-from __future__ import annotations
-
+from __future__ import division
 import sys
-
 import pygame
 
 from config import settings as C
-from sim.simulator import Simulator
-from ui.renderer import Renderer
+from core.state import global_state, AppScreen
+from ui.fonts import UIFonts
+from ui.screens.connection import ConnectionScreen
+from ui.screens.dashboard import DashboardScreen
+from ui.screens.logs import LogScreen
+from ui.screens.settings import SettingsScreen
 
-
-def main() -> None:
+def main():
     pygame.init()
     pygame.display.set_caption(C.APP_NAME)
     screen = pygame.display.set_mode((C.WIDTH, C.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
     clock = pygame.time.Clock()
 
-    simulator = Simulator()
-    renderer = Renderer()
+    fonts = UIFonts.create()
+    
+    global_state.load()
+    if global_state.settings.was_connected:
+        from core.obd_client import obd_client
+        if not global_state.demo_mode:
+            obd_client.start(global_state.settings.ip, global_state.settings.port)
+        else:
+            global_state.connection_status = "connected"
+
+    screens = {
+        AppScreen.CONNECTION: ConnectionScreen(fonts),
+        AppScreen.DASHBOARD: DashboardScreen(fonts),
+        AppScreen.LOG: LogScreen(fonts),
+        AppScreen.SETTINGS: SettingsScreen(fonts),
+    }
 
     running = True
     while running:
         dt = clock.tick(C.FPS) / 1000.0
-        renderer.fps = clock.get_fps() or float(C.FPS)
+        fps = clock.get_fps() or float(C.FPS)
 
+        # Process events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_q):
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                 running = False
+            screens[global_state.screen].handle_event(event)
 
-        frame = simulator.update(dt)
-        renderer.draw(screen, frame)
+        # Draw current screen
+        active_screen = screens[global_state.screen]
+        if global_state.screen == AppScreen.DASHBOARD:
+            active_screen.update(dt)
+            active_screen.draw(screen, fps)
+        else:
+            active_screen.draw(screen)
+
         pygame.display.flip()
 
     pygame.quit()
     sys.exit(0)
-
 
 if __name__ == "__main__":
     main()

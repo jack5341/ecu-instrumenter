@@ -1,34 +1,21 @@
-from __future__ import annotations
-
+from __future__ import division
 import pygame
 
 from config import settings as C
 from ui.color_logic import afr_zone_color
-from ui.fonts import UIFonts
 
-
-def draw_panel(screen: pygame.Surface, rect: pygame.Rect) -> None:
+def draw_panel(screen, rect):
     pygame.draw.rect(screen, C.PANEL, rect)
     pygame.draw.rect(screen, C.BORDER, rect, 1)
 
-
-def draw_grid(screen: pygame.Surface) -> None:
+def draw_grid(screen):
     grid_color = (15, 17, 23)
     for x in range(0, C.WIDTH + 1, 40):
         pygame.draw.line(screen, grid_color, (x, 0), (x, C.HEIGHT), 1)
     for y in range(0, C.HEIGHT + 1, 40):
         pygame.draw.line(screen, grid_color, (0, y), (C.WIDTH, y), 1)
 
-
-def draw_value_panel(
-    screen: pygame.Surface,
-    rect: pygame.Rect,
-    value: float,
-    title: str,
-    accent: tuple[int, int, int],
-    unit: str,
-    fonts: UIFonts,
-) -> None:
+def draw_value_panel(screen, rect, value, title, accent, unit, fonts):
     center_x = rect.centerx
     center_y = rect.centery
 
@@ -45,21 +32,7 @@ def draw_value_panel(
         unit_rect = unit_img.get_rect(center=(int(center_x), int(center_y + 55)))
         screen.blit(unit_img, unit_rect)
 
-
-def draw_bar_gauge(
-    screen: pygame.Surface,
-    x: int,
-    y: int,
-    width: int,
-    height: int,
-    label: str,
-    value: float,
-    vmin: float,
-    vmax: float,
-    unit: str,
-    fonts: UIFonts,
-    danger_hi: float | None,
-) -> None:
+def draw_bar_gauge(screen, x, y, width, height, label, value, vmin, vmax, unit, fonts, danger_hi):
     ratio = (value - vmin) / (vmax - vmin) if vmax > vmin else 0.0
     ratio = max(0.0, min(1.0, ratio))
 
@@ -90,8 +63,7 @@ def draw_bar_gauge(
     value_txt = fonts.unit.render("{0:.0f}{1}".format(value, unit), True, C.WHITE)
     screen.blit(value_txt, (x + width - value_txt.get_width() - 12, y + (height - value_txt.get_height()) // 2))
 
-
-def draw_afr_row(screen: pygame.Surface, afr: float, y: int, fonts: UIFonts) -> None:
+def draw_afr_row(screen, afr, y, fonts):
     left_pad = C.PAD + 15
     width_total = C.WIDTH - 2 * C.PAD - 30
     zone_width = width_total - 120
@@ -129,8 +101,7 @@ def draw_afr_row(screen: pygame.Surface, afr: float, y: int, fonts: UIFonts) -> 
         txt = fonts.tiny.render(label, True, C.DIM)
         screen.blit(txt, (int(text_x - txt.get_width() // 2), zone_rect.bottom + 4))
 
-
-def draw_dtc_panel(screen: pygame.Surface, dtcs: list[str], y: int, fonts: UIFonts) -> None:
+def draw_dtc_panel(screen, dtcs, y, fonts):
     rect = pygame.Rect(C.PAD, y, C.WIDTH - 2 * C.PAD, 40)
     if not dtcs:
         pygame.draw.rect(screen, C.GREEN, rect, 2)
@@ -139,7 +110,7 @@ def draw_dtc_panel(screen: pygame.Surface, dtcs: list[str], y: int, fonts: UIFon
         return
 
     pygame.draw.rect(screen, C.RED, rect, 2)
-    warn = fonts.label.render("⚠", True, C.YELLOW)
+    warn = fonts.label.render("!", True, C.YELLOW) # Python 2 fix for special char if needed
     x = rect.left + 14
     screen.blit(warn, (x, rect.centery - warn.get_height() // 2))
     x += warn.get_width() + 8
@@ -148,8 +119,7 @@ def draw_dtc_panel(screen: pygame.Surface, dtcs: list[str], y: int, fonts: UIFon
         screen.blit(txt, (x, rect.centery - txt.get_height() // 2))
         x += txt.get_width() + 14
 
-
-def draw_status_bar(screen: pygame.Surface, phase_name: str, y: int, fps: float, fonts: UIFonts) -> None:
+def draw_status_bar(screen, phase_name, y, fps, fonts):
     rect = pygame.Rect(0, y, C.WIDTH, C.HEIGHT - y)
     pygame.draw.rect(screen, C.PANEL, rect)
     pygame.draw.line(screen, C.BORDER, (0, y), (C.WIDTH, y), 1)
@@ -158,7 +128,7 @@ def draw_status_bar(screen: pygame.Surface, phase_name: str, y: int, fps: float,
     screen.blit(left, (C.PAD, y + 5))
 
     phase_color = C.PHASE_COLORS.get(phase_name, C.WHITE)
-    mid = fonts.unit.render("DEMO · {0}".format(phase_name.upper()), True, phase_color)
+    mid = fonts.unit.render("DEMO . {0}".format(phase_name.upper()), True, phase_color)
     screen.blit(mid, (C.WIDTH // 2 - mid.get_width() // 2, y + 5))
 
     fps_txt = fonts.unit.render("{0:.0f} FPS".format(fps), True, C.DIM)

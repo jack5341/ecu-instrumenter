@@ -43,9 +43,13 @@ elif [ -f "/mnt/SDCARD/.tmp_update/bin/parasyte/python3" ]; then
     export LD_LIBRARY_PATH=$ParasytePath:$ParasytePath/python3/:$ParasytePath/python3/lib-dynload:$LD_LIBRARY_PATH
     PYTHON_BIN="/mnt/SDCARD/.tmp_update/bin/parasyte/python3"
 
+elif command -v python3 >/dev/null 2>&1; then
+    # Generic python3 in the PATH
+    PYTHON_BIN="python3"
+
 elif [ -f "/mnt/SDCARD/.tmp_update/bin/parasyte/python2" ]; then
     # Fallback to OnionOS built-in Python 2.7 from Parasyte (from the Github script)
-    # WARNING: Your code uses Python 3 typing and might crash here if run in Python 2!
+    # WARNING: Your code uses Python 3 features (dataclasses) and will crash here!
     ParasytePath="/mnt/SDCARD/.tmp_update/lib/parasyte"
     export PYTHONPATH=$ParasytePath/python2.7:$ParasytePath/python2.7/site-packages:$ParasytePath/python2.7/lib-dynload
     export PYTHONHOME=$ParasytePath/python2.7:$ParasytePath/python2.7/site-packages:$ParasytePath/python2.7/lib-dynload
@@ -53,7 +57,6 @@ elif [ -f "/mnt/SDCARD/.tmp_update/bin/parasyte/python2" ]; then
     PYTHON_BIN="/mnt/SDCARD/.tmp_update/bin/parasyte/python2"
 
 else
-    # Hope it's globally mapped by OnionOS
     PYTHON_BIN="python3"
 fi
 
