@@ -1,1 +1,6 @@
-{"ip": "192.168.0.10", "port": 35000, "is_mph": false, "is_fahrenheit": false, "brightness": 100, "was_connected": true, "demo_mode": true}
+{
+    "label": "ECU Instrumenter",
+    "icon": "/mnt/SDCARD/App/ECUInstrumenter/assets/icon.png",
+    "launch": "launch.sh",
+    "description": "Monitor your car"
+}
