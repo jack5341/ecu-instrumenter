@@ -3,13 +3,14 @@ import json
 import os
 
 class AppSettings:
-    def __init__(self, ip="192.168.0.10", port=35000, is_mph=False, is_fahrenheit=False, brightness=100, was_connected=False):
+    def __init__(self, ip="192.168.0.10", port=35000, is_mph=False, is_fahrenheit=False, brightness=100, was_connected=False, demo_mode=False):
         self.ip = ip
         self.port = port
         self.is_mph = is_mph
         self.is_fahrenheit = is_fahrenheit
         self.brightness = brightness
         self.was_connected = was_connected
+        self.demo_mode = demo_mode
 
     def to_dict(self):
         return {
@@ -18,7 +19,8 @@ class AppSettings:
             "is_mph": self.is_mph,
             "is_fahrenheit": self.is_fahrenheit,
             "brightness": self.brightness,
-            "was_connected": self.was_connected
+            "was_connected": self.was_connected,
+            "demo_mode": self.demo_mode
         }
 
 class AppScreen:
@@ -34,7 +36,14 @@ class GlobalState:
         from models.telemetry import TelemetryFrame
         self.telemetry = TelemetryFrame()
         self.connection_status = "disconnected" 
-        self.demo_mode = False
+
+    @property
+    def demo_mode(self):
+        return self.settings.demo_mode
+        
+    @demo_mode.setter
+    def demo_mode(self, val):
+        self.settings.demo_mode = val
 
     def save(self):
         try:
