@@ -42,7 +42,8 @@ class SettingsScreen:
         surface.blit(vers, (C.WIDTH // 2 - vers.get_width() // 2, 440))
 
     def handle_event(self, event):
-        if event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_b):
+        # We also want to support B button to go back.
+        if event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_b, pygame.K_LALT):
             self._on_back()
             return
         self.menu.handle_event(event)

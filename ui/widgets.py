@@ -34,21 +34,18 @@ class IpInputWidget(Widget):
                 val_x += dot.get_width()
 
     def handle_left(self):
-        self.selected_part = max(0, self.selected_part - 1)
+        # Change value down
+        self.parts[self.selected_part] = max(0, self.parts[self.selected_part] - 1)
+        self.value = ".".join([str(p) for p in self.parts])
     
     def handle_right(self):
-        self.selected_part = min(3, self.selected_part + 1)
-    
-    def handle_up(self):
+        # Change value up
         self.parts[self.selected_part] = min(255, self.parts[self.selected_part] + 1)
         self.value = ".".join([str(p) for p in self.parts])
         
-    def handle_down(self):
-        self.parts[self.selected_part] = max(0, self.parts[self.selected_part] - 1)
-        self.value = ".".join([str(p) for p in self.parts])
-        
     def handle_click(self):
-        self.handle_right()
+        # Cycle through segments
+        self.selected_part = (self.selected_part + 1) % 4
 
 class PortInputWidget(Widget):
     def __init__(self, label, value):
@@ -63,10 +60,9 @@ class PortInputWidget(Widget):
         val = fonts.label.render(str(self.value), True, color)
         surface.blit(val, (x + 200, y))
 
-    def handle_left(self): self.value = max(0, self.value - 100)
-    def handle_right(self): self.value += 100
-    def handle_up(self): self.value += 1
-    def handle_down(self): self.value = max(0, self.value - 1)
+    def handle_left(self): self.value = max(0, self.value - 1)
+    def handle_right(self): self.value = min(65535, self.value + 1)
+    def handle_click(self): self.value += 100 # Quick jump
 
 class ToggleWidget(Widget):
     def __init__(self, label, value):
@@ -142,23 +138,21 @@ class MenuList:
 
     def handle_event(self, event):
         if not self.items: return
-            
         item = self.items[self.selected_idx]
         
         if event.type == pygame.KEYDOWN:
+            # UP/DOWN ALWAYS naviage the list
             if event.key == pygame.K_UP:
-                if hasattr(item, "handle_up") and hasattr(item, "handle_down"):
-                    item.handle_up()
-                elif self.selected_idx > 0:
+                if self.selected_idx > 0:
                     self.selected_idx -= 1
             elif event.key == pygame.K_DOWN:
-                if hasattr(item, "handle_up") and hasattr(item, "handle_down"):
-                    item.handle_down()
-                elif self.selected_idx < len(self.items) - 1:
+                if self.selected_idx < len(self.items) - 1:
                     self.selected_idx += 1
+            # LEFT/RIGHT change values
             elif event.key == pygame.K_LEFT:
                 item.handle_left()
             elif event.key == pygame.K_RIGHT:
                 item.handle_right()
+            # A / SPACE clicks
             elif event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_z, pygame.K_x):
                 item.handle_click()
