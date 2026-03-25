@@ -3,7 +3,7 @@ import json
 import os
 
 class AppSettings:
-    def __init__(self, ip="192.168.0.10", port=35000, is_mph=False, is_fahrenheit=False, brightness=100, was_connected=False, demo_mode=False):
+    def __init__(self, ip="127.0.0.1", port=35000, is_mph=False, is_fahrenheit=False, brightness=100, was_connected=False, demo_mode=False):
         self.ip = ip
         self.port = port
         self.is_mph = is_mph

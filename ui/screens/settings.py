@@ -11,22 +11,27 @@ class SettingsScreen:
         self.port_input = PortInputWidget("PORT", global_state.settings.port)
         self.mph_toggle = ToggleWidget("USE MPH / F", global_state.settings.is_mph)
         self.bright_slider = SliderWidget("BRIGHTNESS", global_state.settings.brightness, 10, 100)
+        self.demo_toggle = ToggleWidget("DEMO MODE", global_state.demo_mode)
         
         btn_clear_dtc = ButtonWidget("CLEAR FAULT CODES", self._on_clear_dtc)
         
-        items = [self.ip_input, self.port_input, self.mph_toggle, self.bright_slider, btn_clear_dtc]
+        items = [self.ip_input, self.port_input, self.mph_toggle, self.bright_slider, self.demo_toggle, btn_clear_dtc]
         self.menu = MenuList(items, self.fonts)
         
     def _on_clear_dtc(self):
         global_state.telemetry.dtcs = []
         
-    def _on_back(self):
+    def _save_settings(self):
         global_state.settings.ip = self.ip_input.value
         global_state.settings.port = self.port_input.value
         global_state.settings.is_mph = self.mph_toggle.value
         global_state.settings.is_fahrenheit = self.mph_toggle.value
         global_state.settings.brightness = self.bright_slider.value
+        global_state.demo_mode = self.demo_toggle.value
         global_state.save()
+
+    def _on_back(self):
+        self._save_settings()
         global_state.screen = AppScreen.DASHBOARD
 
     def draw(self, surface):
@@ -52,6 +57,7 @@ class SettingsScreen:
                 self._on_back()
                 return
             elif event.key == pygame.K_LEFT:
+                self._save_settings()
                 global_state.screen = AppScreen.LOG
                 return
             elif event.key == pygame.K_RIGHT:

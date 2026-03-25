@@ -8,7 +8,7 @@ class ConnectionScreen:
     def __init__(self, fonts):
         self.fonts = fonts
         
-        self.ip_input = IpInputWidget("IP ADDRESS", "192.168.0.10")
+        self.ip_input = IpInputWidget("IP ADDRESS", "127.0.0.1")
         self.port_input = PortInputWidget("PORT", 35000)
         
         btn_connect = ButtonWidget("CONNECT", self._on_connect)

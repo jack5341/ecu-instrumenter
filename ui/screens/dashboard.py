@@ -62,7 +62,7 @@ class DashboardScreen:
         w_third = (w_total - 2 * gap) // 3
         
         thr_rect = pygame.Rect(p, r2_y, w_third, r2_h)
-        draw_card(surface, thr_rect, "THROTTLE", "{0:.0f}".format(t.throttle), "%", self.fonts.value, C.WHITE, self.fonts)
+        draw_card(surface, thr_rect, "THROTTLE", "{0:.0f}".format(t.throttle), "%", self.fonts.value, C.WHITE, self.fonts, progress_ratio=(t.throttle / 100.0))
         
         oil_rect = pygame.Rect(p + w_third + gap, r2_y, w_third, r2_h)
         oil_temp = t.coolant + 20

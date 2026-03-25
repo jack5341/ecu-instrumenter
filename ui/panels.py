@@ -80,7 +80,7 @@ def draw_tab_bar(screen, active_tab_index, fonts):
         screen.blit(t_surf, (t_rect.centerx - t_surf.get_width() // 2, t_rect.bottom - 15))
 
 
-def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fonts, alert=False):
+def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fonts, alert=False, progress_ratio=None):
     # Base card
     pygame.draw.rect(screen, (25, 25, 25), rect)
     
@@ -91,26 +91,40 @@ def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fon
     # Value
     v_surf = val_font.render(value_str, True, val_color)
     v_y = rect.bottom - 15 - v_surf.get_height()
+    if progress_ratio is not None:
+        v_y -= 10  # lift text slightly to make room for bar
     screen.blit(v_surf, (rect.left + 15, v_y))
     
     # Unit
     if unit_str:
         u_surf = fonts.unit.render(unit_str, True, C.DIM)
         # align to baseline
-        screen.blit(u_surf, (rect.left + 15 + v_surf.get_width() + 5, rect.bottom - 20 - u_surf.get_height()))
+        screen.blit(u_surf, (rect.left + 15 + v_surf.get_width() + 5, v_y + v_surf.get_height() - u_surf.get_height() - 5))
         
     # Top Right Icons
     if title == "ENGINE RPM":
-        # Refresh arrows (simplified)
         pygame.draw.circle(screen, C.DIM, (rect.right - 20, rect.top + 20), 6, 2)
     elif title == "COOLANT":
-        # Thermometer icon and red background
         icon_r = pygame.Rect(rect.right - 40, rect.top, 40, 40)
         pygame.draw.rect(screen, (60, 20, 20), icon_r)
-        # draw thermo
         cx, cy = icon_r.centerx, icon_r.centery
         pygame.draw.circle(screen, C.ORANGE, (cx, cy + 5), 4)
         pygame.draw.line(screen, C.ORANGE, (cx, cy + 5), (cx, cy - 8), 3)
+
+    # Progress Bar at the bottom
+    if progress_ratio is not None:
+        bar_h = 6
+        pad_x = 15
+        bar_rect = pygame.Rect(rect.left + pad_x, rect.bottom - bar_h - 10, rect.width - pad_x * 2, bar_h)
+        pygame.draw.rect(screen, (40, 40, 40), bar_rect)
+        
+        ratio = max(0.0, min(1.0, progress_ratio))
+        fill_w = int(bar_rect.width * ratio)
+        if fill_w > 0:
+            fill_rect = pygame.Rect(bar_rect.left, bar_rect.top, fill_w, bar_h)
+            # Pick color based on title (or simple orange for throttle)
+            bar_color = C.ORANGE
+            pygame.draw.rect(screen, bar_color, fill_rect)
 
 def draw_afr_full(screen, rect, afr, fonts):
     pygame.draw.rect(screen, (25, 25, 25), rect)
