@@ -1,8 +1,8 @@
 # ECU Instrumenter 🏎️
 
-> **v1.0** — High-Performance OBD-II Racing Dashboard for Miyoo Mini Plus
+> **v1.0** — High-Performance OBD-II Dashboard for Miyoo Mini Plus
 
-ECU Instrumenter is a lightweight, GT3-inspired telemetry dashboard designed specifically for the **Miyoo Mini Plus (OnionOS)**. Built efficiently in Python, it connects wirelessly to any standard ELM327 Wi-Fi OBD-II adapter, instantly transforming your retro handheld console into a dynamic, real-time vehicle instrument cluster!
+ECU Instrumenter is a lightweight telemetry dashboard designed specifically for the **Miyoo Mini Plus (OnionOS)**. Built efficiently in Python, it connects wirelessly to any standard ELM327 Wi-Fi OBD-II adapter, instantly transforming your retro handheld console into a dynamic, real-time vehicle instrument cluster!
 
 ![ECU Instrumenter running on Miyoo Mini Plus](assets/ecu-instrumenter.png)
 
