@@ -1,6 +1,12 @@
-.PHONY: run deploy
+.PHONY: run deploy check
 
 MIYOO_IP ?= 192.168.1.53
+
+check:
+	@echo "Compiling Python files to check syntax..."
+	@python3 -m py_compile app.py mock_server.py
+	@find core ui sim models config -name "*.py" -exec python3 -m py_compile {} +
+	@echo "✅ All Python files passed syntax check!"
 
 run:
 	python3 app.py
