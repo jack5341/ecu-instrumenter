@@ -8,17 +8,17 @@ class DisplaySettings:
 
 class ThemeSettings:
     def __init__(self):
-        self.bg = (10, 12, 18)
-        self.panel = (18, 22, 32)
-        self.border = (35, 42, 60)
-        self.white = (220, 228, 240)
-        self.dim = (80, 90, 110)
+        self.bg = (10, 10, 10)
+        self.panel = (28, 28, 28)
+        self.border = (45, 45, 45)
+        self.white = (245, 245, 245)
+        self.dim = (160, 160, 160)
         self.cyan = (0, 210, 255)
-        self.green = (0, 230, 120)
-        self.orange = (255, 160, 30)
+        self.green = (25, 180, 25)
+        self.orange = (255, 100, 30)
         self.red = (255, 55, 55)
         self.yellow = (255, 220, 0)
-        self.purple = (160, 80, 255)
+        self.purple = (100, 80, 255)
 
 class ThresholdSettings:
     def __init__(self):

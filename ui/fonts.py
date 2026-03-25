@@ -18,9 +18,9 @@ class UIFonts:
     @classmethod
     def create(cls):
         return cls(
-            huge_f=mono_font(64, bold=True),
+            huge_f=mono_font(72, bold=True),
             value_f=mono_font(42, bold=True),
-            label_f=mono_font(20, bold=True),
-            unit_f=mono_font(16),
-            tiny_f=mono_font(12),
+            label_f=mono_font(18, bold=True),
+            unit_f=mono_font(14, bold=False),
+            tiny_f=mono_font(12, bold=False),
         )

@@ -4,7 +4,7 @@
 
 ECU Instrumenter is a dashboard application for displaying ECU data on Miyoo Mini Plus (OnionOS).
 
-![ECU Instrumenter running on Miyoo Mini Plus](assets/in-miyoo.jpg)
+![ECU Instrumenter running on Miyoo Mini Plus](assets/ecu-instrumenter.png)
 
 ## Features
 

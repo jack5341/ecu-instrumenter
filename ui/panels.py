@@ -1,90 +1,141 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 import pygame
-
 from config import settings as C
-from ui.color_logic import afr_zone_color
 
-def draw_stat_panel(screen, rect, title, value_str, unit, ratio, bar_color, val_font, fonts, warning=False):
-    # Background
-    pygame.draw.rect(screen, C.PANEL, rect)
-    pygame.draw.rect(screen, C.RED if warning else C.BORDER, rect, 2)
+def draw_top_bar(screen, title, right_text, is_streaming, fonts):
+    h = 40
+    rect = pygame.Rect(0, 0, C.WIDTH, h)
+    pygame.draw.rect(screen, (15, 15, 15), rect)
+    pygame.draw.line(screen, (40, 40, 40), (0, h-1), (C.WIDTH, h-1), 1)
     
-    # Title - Top Left
-    title_color = C.RED if warning else C.DIM
-    lbl = fonts.label.render(title, True, title_color)
-    screen.blit(lbl, (rect.left + 15, rect.top + 15))
-    
-    # Value & Unit - Bottom Right (above bar)
-    val = val_font.render(value_str, True, C.WHITE)
-    un = fonts.unit.render(unit, True, C.DIM) if unit else None
-    
-    val_y = rect.bottom - 20 - val.get_height()
-    
-    total_w = val.get_width() + 8 + un.get_width() if un else val.get_width()
-    start_x = rect.right - 15 - total_w
-    
-    screen.blit(val, (start_x, val_y))
-    if un:
-        # Align unit to the baseline of the value text
-        screen.blit(un, (start_x + val.get_width() + 8, val_y + val.get_height() - un.get_height() - 5))
+    # Title - Aligned left, vertically centered
+    t_surf = fonts.label.render(title, True, C.WHITE)
+    t_y = (h - t_surf.get_height()) // 2
+    screen.blit(t_surf, (15, t_y))
+
+    # Right side (Status Badge)
+    if right_text:
+        pad_x = 8
+        pad_y = 4
+        badge_font = fonts.unit
+        r_surf = badge_font.render(right_text, True, C.WHITE)
+        badge_w = r_surf.get_width() + (pad_x * 2) + 15
+        badge_h = r_surf.get_height() + (pad_y * 2)
+        badge_rect = pygame.Rect(C.WIDTH - C.PAD - badge_w, (h - badge_h) // 2, badge_w, badge_h)
         
-    # Bottom fill bar
-    bar_h = 8
-    bar_rect = pygame.Rect(rect.left + 2, rect.bottom - bar_h - 2, rect.width - 4, bar_h)
-    pygame.draw.rect(screen, (25, 30, 40), bar_rect) # Empty background
-    
-    ratio = max(0.0, min(1.0, ratio))
-    fill_w = int((rect.width - 4) * ratio)
-    if fill_w > 0:
-        pygame.draw.rect(screen, bar_color, pygame.Rect(rect.left + 2, rect.bottom - bar_h - 2, fill_w, bar_h))
+        # Draw dot
+        dot_color = C.GREEN if is_streaming else C.RED
+        dot_radius = 4
+        pygame.draw.circle(screen, dot_color, (badge_rect.left + pad_x + dot_radius, badge_rect.centery), dot_radius)
+        
+        screen.blit(r_surf, (badge_rect.left + pad_x + 15, badge_rect.top + pad_y))
 
-def draw_afr_panel(screen, rect, afr, fonts):
-    pygame.draw.rect(screen, C.PANEL, rect)
-    pygame.draw.rect(screen, C.BORDER, rect, 2)
+def draw_tab_bar(screen, active_tab_index, fonts):
+    h = 50
+    y = C.HEIGHT - h
+    rect = pygame.Rect(0, y, C.WIDTH, h)
+    pygame.draw.rect(screen, (10, 10, 10), rect)
     
-    lbl = fonts.label.render("AIR / FUEL RATIO", True, C.DIM)
-    screen.blit(lbl, (rect.left + 15, rect.top + 15))
+    tabs = ["DASHBOARD", "LOGS", "SETTINGS"]
+    tab_w = C.WIDTH // len(tabs)
     
-    # Draw large AFR value
-    accent = afr_zone_color(afr)
-    val = fonts.value.render("{0:.1f}".format(afr), True, accent)
-    screen.blit(val, (rect.right - 15 - val.get_width(), rect.top + 10))
-    
-    # Draw AFR meter at the bottom
-    bar_h = 24
-    bar_w = rect.width - 30
-    bar_x = rect.left + 15
-    bar_y = rect.bottom - bar_h - 15
-    meter_rect = pygame.Rect(bar_x, bar_y, bar_w, bar_h)
-    
-    afr_range = C.AFR_MAX - C.AFR_MIN
-    curr_x = meter_rect.left
-    for lo, hi, color in C.AFR_ZONES:
-        w = int((hi - lo) / afr_range * meter_rect.width)
-        pygame.draw.rect(screen, color, (curr_x, meter_rect.top, max(1, w), meter_rect.height))
-        curr_x += w
-    pygame.draw.rect(screen, C.BORDER, meter_rect, 1)
+    for i, tab in enumerate(tabs):
+        t_rect = pygame.Rect(i * tab_w, y, tab_w, h)
+        is_active = (i == active_tab_index)
+        
+        if is_active:
+            pygame.draw.rect(screen, (50, 50, 50), t_rect)
+            pygame.draw.line(screen, C.WHITE, (t_rect.left, t_rect.top), (t_rect.right, t_rect.top), 2)
+        else:
+            pygame.draw.rect(screen, (30, 30, 30), t_rect)
+            pygame.draw.line(screen, (20, 20, 20), (t_rect.right-1, t_rect.top), (t_rect.right-1, t_rect.bottom), 1)
 
-    needle_t = max(0.0, min(1.0, (afr - C.AFR_MIN) / afr_range))
-    needle_x = int(meter_rect.left + needle_t * meter_rect.width)
-    pygame.draw.line(screen, C.WHITE, (needle_x, meter_rect.top - 4), (needle_x, meter_rect.bottom + 4), 3)
+        # Draw icon
+        icon_color = C.WHITE if is_active else C.DIM
+        icon_cx = t_rect.centerx
+        icon_cy = t_rect.top + 15
+        
+        if tab == "DASHBOARD":
+            # 2x2 grid
+            for dx in (-4, 2):
+                for dy in (-4, 2):
+                    pygame.draw.rect(screen, icon_color, (icon_cx + dx, icon_cy + dy, 4, 4))
+        elif tab == "LOGS":
+            # List
+            for dy in (-4, 0, 4):
+                pygame.draw.rect(screen, icon_color, (icon_cx - 6, icon_cy + dy, 3, 2))
+                pygame.draw.rect(screen, icon_color, (icon_cx - 1, icon_cy + dy, 8, 2))
+        elif tab == "SETTINGS":
+            # Gear
+            pygame.draw.circle(screen, icon_color, (icon_cx, icon_cy), 4, 2)
+            for dy in (-5, 3):
+                pygame.draw.rect(screen, icon_color, (icon_cx - 1, icon_cy + dy, 2, 2))
+            for dx in (-5, 3):
+                pygame.draw.rect(screen, icon_color, (icon_cx + dx, icon_cy - 1, 2, 2))
 
-def draw_dtc_panel(screen, dtcs, y, fonts):
-    rect = pygame.Rect(C.PAD, y, C.WIDTH - 2 * C.PAD, 45)
-    if not dtcs:
-        pygame.draw.rect(screen, (15, 30, 20), rect) # Dark green bg
-        pygame.draw.rect(screen, C.GREEN, rect, 2)
-        msg = fonts.label.render("SYSTEM CLEAR - NO FAULT CODES", True, C.GREEN)
-        screen.blit(msg, (rect.centerx - msg.get_width() // 2, rect.centery - msg.get_height() // 2))
-        return
+        # Text
+        color = C.WHITE if is_active else C.DIM
+        t_surf = fonts.tiny.render(tab, True, color)
+        screen.blit(t_surf, (t_rect.centerx - t_surf.get_width() // 2, t_rect.bottom - 15))
 
-    pygame.draw.rect(screen, (40, 15, 15), rect) # Dark red bg
-    pygame.draw.rect(screen, C.RED, rect, 2)
-    warn = fonts.label.render("!", True, C.YELLOW)
-    x = rect.left + 20
-    screen.blit(warn, (x, rect.centery - warn.get_height() // 2))
+
+def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fonts, alert=False):
+    # Base card
+    pygame.draw.rect(screen, (25, 25, 25), rect)
     
-    dtc_str = " ".join(dtcs)
-    txt = fonts.label.render("FAULT CODES: " + dtc_str, True, C.YELLOW)
-    screen.blit(txt, (x + warn.get_width() + 15, rect.centery - txt.get_height() // 2))
+    # Title
+    t_surf = fonts.unit.render(title, True, C.DIM if not alert else C.ORANGE)
+    screen.blit(t_surf, (rect.left + 15, rect.top + 15))
+    
+    # Value
+    v_surf = val_font.render(value_str, True, val_color)
+    v_y = rect.bottom - 15 - v_surf.get_height()
+    screen.blit(v_surf, (rect.left + 15, v_y))
+    
+    # Unit
+    if unit_str:
+        u_surf = fonts.unit.render(unit_str, True, C.DIM)
+        # align to baseline
+        screen.blit(u_surf, (rect.left + 15 + v_surf.get_width() + 5, rect.bottom - 20 - u_surf.get_height()))
+        
+    # Top Right Icons
+    if title == "ENGINE RPM":
+        # Refresh arrows (simplified)
+        pygame.draw.circle(screen, C.DIM, (rect.right - 20, rect.top + 20), 6, 2)
+    elif title == "COOLANT":
+        # Thermometer icon and red background
+        icon_r = pygame.Rect(rect.right - 40, rect.top, 40, 40)
+        pygame.draw.rect(screen, (60, 20, 20), icon_r)
+        # draw thermo
+        cx, cy = icon_r.centerx, icon_r.centery
+        pygame.draw.circle(screen, C.ORANGE, (cx, cy + 5), 4)
+        pygame.draw.line(screen, C.ORANGE, (cx, cy + 5), (cx, cy - 8), 3)
+
+def draw_afr_full(screen, rect, afr, fonts):
+    pygame.draw.rect(screen, (25, 25, 25), rect)
+    
+    t_surf = fonts.unit.render("AIR/FUEL RATIO (AFR)", True, C.DIM)
+    screen.blit(t_surf, (rect.left + 15, rect.top + 15))
+    
+    if afr > 15.0:
+        badge_text = "LEAN"
+        badge_color = C.RED
+        val_color = C.RED
+    elif afr < 13.5:
+        badge_text = "RICH"
+        badge_color = C.ORANGE
+        val_color = C.ORANGE
+    else:
+        badge_text = "STABLE"
+        badge_color = C.GREEN
+        val_color = C.WHITE
+
+    v_surf = fonts.huge.render("{0:.1f}".format(afr), True, val_color)
+    screen.blit(v_surf, (rect.left + 15, rect.bottom - 15 - v_surf.get_height()))
+    
+    # Badge right
+    b_surf = fonts.unit.render(badge_text, True, badge_color)
+    b_rect = pygame.Rect(rect.right - 15 - b_surf.get_width() - 20, rect.top + 15, b_surf.get_width() + 20, b_surf.get_height() + 10)
+    pygame.draw.rect(screen, badge_color, b_rect, 1)
+    screen.blit(b_surf, (b_rect.left + 10, b_rect.top + 5))
