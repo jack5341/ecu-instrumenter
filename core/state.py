@@ -3,7 +3,7 @@ import json
 import os
 
 class AppSettings:
-    def __init__(self, ip="127.0.0.1", port=35000, is_mph=False, is_fahrenheit=False, brightness=100, was_connected=False, demo_mode=False):
+    def __init__(self, ip="127.0.0.1", port=35000, is_mph=False, is_fahrenheit=False, brightness=100, was_connected=False, demo_mode=False, oil_warn=130, coolant_warn=105, save_history=False):
         self.ip = ip
         self.port = port
         self.is_mph = is_mph
@@ -11,6 +11,9 @@ class AppSettings:
         self.brightness = brightness
         self.was_connected = was_connected
         self.demo_mode = demo_mode
+        self.oil_warn = oil_warn
+        self.coolant_warn = coolant_warn
+        self.save_history = save_history
 
     def to_dict(self):
         return {
@@ -20,7 +23,10 @@ class AppSettings:
             "is_fahrenheit": self.is_fahrenheit,
             "brightness": self.brightness,
             "was_connected": self.was_connected,
-            "demo_mode": self.demo_mode
+            "demo_mode": self.demo_mode,
+            "oil_warn": getattr(self, 'oil_warn', 130),
+            "coolant_warn": getattr(self, 'coolant_warn', 105),
+            "save_history": getattr(self, 'save_history', False)
         }
 
 class AppScreen:
