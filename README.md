@@ -4,7 +4,7 @@
 
 ECU Instrumenter is a lightweight telemetry dashboard designed specifically for the **Miyoo Mini Plus (OnionOS)**. Built efficiently in Python, it connects wirelessly to any standard ELM327 Wi-Fi OBD-II adapter, instantly transforming your retro handheld console into a dynamic, real-time vehicle instrument cluster!
 
-![ECU Instrumenter running on Miyoo Mini Plus](assets/ecu-instrumenter.png)
+![ECU Instrumenter running on Miyoo Mini Plus](assets/in-miyoo.png)
 
 - **Wireless OBD-II Connectivity:** Automatically polls and parses TCP ELM327 packets (RPM, Speed, Throttle, Coolant, Oil, AFR) over standard vehicle Wi-Fi hotspots.
 - **Memory-Efficient Telemetry Logging:** Activate `SAVE HISTORY` to silently spool your engine's vitals into an efficient `history.log` (JSON Lines format) exactly every 5 seconds for track analysis, meticulously designed not to overflow the Miyoo's limited 128MB RAM footprint
