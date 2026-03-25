@@ -114,6 +114,22 @@ class OBDClient:
                 pass
         return None
 
+    def _save_telemetry_history(self):
+        import json
+        try:
+            record = {
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "rpm": global_state.telemetry.rpm,
+                "speed": global_state.telemetry.speed,
+                "throttle": global_state.telemetry.throttle,
+                "coolant": global_state.telemetry.coolant,
+                "afr": getattr(global_state.telemetry, 'afr', 14.7)
+            }
+            # Append as JSON Lines for performance on the Miyoo
+            with open("history.log", "a") as f:
+                f.write(json.dumps(record) + "\n")
+        except: pass
+
     def _run(self, ip, port):
         global_state.connection_status = "connecting"
         msg = "Connecting to {0}:{1}...".format(ip, port)
@@ -129,6 +145,7 @@ class OBDClient:
             self._send("ATZ")
             self._send("ATE0")
 
+            last_save_time = time.time()
             while self._running:
                 for pid, config in self._pid_map.items():
                     data = self._query_pid(pid)
@@ -138,6 +155,12 @@ class OBDClient:
                             setattr(global_state.telemetry, config["attr"], val)
                         except Exception as e:
                             logger.log("warning", "Parse error for {0}: {1}".format(pid, str(e)))
+                
+                # Check for history save
+                if getattr(global_state.settings, 'save_history', False):
+                    if time.time() - last_save_time >= 5.0:
+                        self._save_telemetry_history()
+                        last_save_time = time.time()
                 
                 time.sleep(0.1)
 

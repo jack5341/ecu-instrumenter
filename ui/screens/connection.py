@@ -8,21 +8,20 @@ class ConnectionScreen:
     def __init__(self, fonts):
         self.fonts = fonts
         
-        self.ip_input = IpInputWidget("IP ADDRESS", "127.0.0.1")
-        self.port_input = PortInputWidget("PORT", 35000)
+        btn_connect = ButtonWidget("CONNECT TO ECU", self._on_connect)
+        btn_demo = ButtonWidget("START DEMO MODE", self._on_demo)
         
-        btn_connect = ButtonWidget("CONNECT", self._on_connect)
-        btn_demo = ButtonWidget("DEMO MODE", self._on_demo)
-        
-        self.menu = MenuList([self.ip_input, self.port_input, btn_connect, btn_demo], fonts)
+        self.menu = MenuList([btn_connect, btn_demo], fonts)
         
     def _on_connect(self):
-        global_state.settings.ip = self.ip_input.value
-        global_state.settings.port = self.port_input.value
+        # We fetch hardware IP from core settings which are fixed now
+        ip = getattr(global_state.settings, 'ip', '127.0.0.1')
+        port = getattr(global_state.settings, 'port', 35000)
+        
         global_state.settings.was_connected = True
         global_state.demo_mode = False
         global_state.save()
-        obd_client.start(global_state.settings.ip, global_state.settings.port)
+        obd_client.start(ip, port)
         global_state.screen = AppScreen.DASHBOARD
         
     def _on_demo(self):

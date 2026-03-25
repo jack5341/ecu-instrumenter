@@ -132,28 +132,45 @@ class MenuList:
         self.items = items
         self.fonts = fonts
         self.selected_idx = 0
+        self.editing = False
 
     def draw(self, surface, x, y, item_height=50, width=300):
         for i, item in enumerate(self.items):
             item.draw(surface, x, y + i * item_height, width, i == self.selected_idx, self.fonts)
+            
+            if i == self.selected_idx and self.editing:
+                from config import settings as C
+                # Draw a small active edit indicator
+                pygame.draw.rect(surface, C.GREEN, (x - 20, y + i * item_height + 15, 8, 8))
 
     def handle_event(self, event):
-        if not self.items: return
+        if not self.items: return False
         item = self.items[self.selected_idx]
         
         if event.type == pygame.KEYDOWN:
-            # UP/DOWN ALWAYS naviage the list
-            if event.key == pygame.K_UP:
-                if self.selected_idx > 0:
-                    self.selected_idx -= 1
-            elif event.key == pygame.K_DOWN:
-                if self.selected_idx < len(self.items) - 1:
-                    self.selected_idx += 1
-            # LEFT/RIGHT change values
-            elif event.key == pygame.K_LEFT:
-                item.handle_left()
-            elif event.key == pygame.K_RIGHT:
-                item.handle_right()
-            # A / SPACE clicks
-            elif event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_z, pygame.K_x):
-                item.handle_click()
+            if self.editing:
+                if event.key == pygame.K_LEFT:
+                    item.handle_left()
+                    return True
+                elif event.key == pygame.K_RIGHT:
+                    item.handle_right()
+                    return True
+                elif event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_z, pygame.K_x, pygame.K_ESCAPE, pygame.K_b, pygame.K_LALT):
+                    self.editing = False
+                    return True
+            else:
+                if event.key == pygame.K_UP:
+                    if self.selected_idx > 0:
+                        self.selected_idx -= 1
+                    return True
+                elif event.key == pygame.K_DOWN:
+                    if self.selected_idx < len(self.items) - 1:
+                        self.selected_idx += 1
+                    return True
+                elif event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_z, pygame.K_x):
+                    item.handle_click()
+                    # Only generic inputs (sliders) need to lock editing focus for left/right
+                    if type(item).__name__ == "SliderWidget" or type(item).__name__ == "IpInputWidget" or type(item).__name__ == "PortInputWidget":
+                        self.editing = True
+                    return True
+        return False

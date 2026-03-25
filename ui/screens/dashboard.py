@@ -49,7 +49,8 @@ class DashboardScreen:
         w_spd = w_total - w_rpm - gap
         
         rpm_rect = pygame.Rect(p, r1_y, w_rpm, r1_h)
-        draw_card(surface, rpm_rect, "ENGINE RPM", "{0:.0f}".format(t.rpm), "RPM", self.fonts.huge, C.WHITE, self.fonts)
+        rpm_color = C.WHITE
+        draw_card(surface, rpm_rect, "ENGINE RPM", "{0:.0f}".format(t.rpm), "RPM", self.fonts.huge, rpm_color, self.fonts)
         
         spd_val = t.speed * 0.621371 if getattr(global_state.settings, 'is_mph', True) else t.speed
         spd_unit = "MPH" if getattr(global_state.settings, 'is_mph', True) else "KM/H"
@@ -75,12 +76,33 @@ class DashboardScreen:
             
         oil_unit = "°F" if is_f else "°C"
         oil_v = oil_temp * 9/5 + 32 if is_f else oil_temp
-        draw_card(surface, oil_rect, "OIL TEMP", "{0:.0f}".format(oil_v), oil_unit, self.fonts.value, C.WHITE, self.fonts)
+        
+        oil_warn_thresh = getattr(global_state.settings, 'oil_warn', 130)
+        
+        if oil_temp < 50:
+            oil_color = C.CYAN
+            is_oil_hot = False
+        elif oil_temp >= oil_warn_thresh:
+            oil_color = C.RED
+            is_oil_hot = True
+        elif oil_temp >= oil_warn_thresh - 15:
+            oil_color = C.ORANGE
+            is_oil_hot = False
+        else:
+            oil_color = C.WHITE
+            is_oil_hot = False
+            
+        draw_card(surface, oil_rect, "OIL TEMP", "{0:.0f}".format(oil_v), oil_unit, self.fonts.value, oil_color, self.fonts, alert=is_oil_hot)
         
         cool_rect = pygame.Rect(p + 2 * (w_third + gap), r2_y, w_third, r2_h)
         cool_unit = "°F" if is_f else "°C"
         cool_v = t.coolant * 9/5 + 32 if is_f else t.coolant
-        draw_card(surface, cool_rect, "COOLANT", "{0:.0f}".format(cool_v), cool_unit, self.fonts.value, C.ORANGE, self.fonts, alert=True)
+        
+        warn_thresh = getattr(global_state.settings, 'coolant_warn', 105)
+        is_hot = (t.coolant >= warn_thresh)
+        cool_color = C.RED if is_hot else C.ORANGE
+        
+        draw_card(surface, cool_rect, "COOLANT", "{0:.0f}".format(cool_v), cool_unit, self.fonts.value, cool_color, self.fonts, alert=is_hot)
 
         # Row 3
         r3_y = r2_y + r2_h + gap
