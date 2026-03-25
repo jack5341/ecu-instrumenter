@@ -1,4 +1,4 @@
-# ECU Instrumenter 🏎️
+# ECU Instrumenter 
 
 > **v1.0** — High-Performance OBD-II Dashboard for Miyoo Mini Plus
 
