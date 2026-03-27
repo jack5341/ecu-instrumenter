@@ -8,15 +8,15 @@ class DisplaySettings:
 
 class ThemeSettings:
     def __init__(self):
-        self.bg = (10, 10, 10)
-        self.panel = (28, 28, 28)
-        self.border = (45, 45, 45)
-        self.white = (245, 245, 245)
-        self.dim = (160, 160, 160)
-        self.cyan = (0, 210, 255)
+        self.bg = (0, 0, 0)
+        self.panel = (26, 26, 26)
+        self.border = (50, 50, 50)
+        self.white = (255, 255, 255)
+        self.dim = (140, 140, 140)
+        self.cyan = (255, 0, 18)
         self.green = (25, 180, 25)
         self.orange = (255, 100, 30)
-        self.red = (255, 55, 55)
+        self.red = (255, 0, 18)
         self.yellow = (255, 220, 0)
         self.purple = (100, 80, 255)
 

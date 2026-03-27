@@ -22,20 +22,22 @@ class ConnectionScreen:
         global_state.demo_mode = False
         global_state.save()
         obd_client.start(ip, port)
-        global_state.screen = AppScreen.DASHBOARD
+        global_state.screen = AppScreen.LOADING
         
     def _on_demo(self):
         global_state.demo_mode = True
         global_state.settings.was_connected = True
+        # Simulate fault codes to test the UI
+        global_state.telemetry.dtcs = ["P0171", "P0300", "P0420"]
         global_state.save()
         global_state.connection_status = "connected"
-        global_state.screen = AppScreen.DASHBOARD
+        global_state.screen = AppScreen.LOADING
 
     def draw(self, surface):
         from config import settings as C
         surface.fill(C.BG)
         # draw logo/name
-        name = self.fonts.value.render("ECU INSTRUMENTER", True, C.CYAN)
+        name = self.fonts.title.render("ECU INSTRUMENTER", True, C.RED)
         surface.blit(name, (C.WIDTH // 2 - name.get_width() // 2, 80))
         
         # draw menu
@@ -47,7 +49,7 @@ class ConnectionScreen:
         elif global_state.connection_status == "connected": status_color = C.GREEN
         
         status_text = "STATUS: " + global_state.connection_status.upper()
-        status = self.fonts.label.render(status_text, True, status_color)
+        status = self.fonts.button.render(status_text, True, status_color)
         surface.blit(status, (C.WIDTH // 2 - status.get_width() // 2, 420))
 
     def handle_event(self, event):

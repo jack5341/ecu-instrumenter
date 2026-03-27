@@ -31,7 +31,9 @@ class AppSettings:
 
 class AppScreen:
     CONNECTION = "connection"
+    LOADING = "loading"
     DASHBOARD = "dashboard"
+    ERRORS = "errors"
     LOG = "log"
     SETTINGS = "settings"
 
@@ -64,8 +66,8 @@ class GlobalState:
                 with open("settings.json", "r") as f:
                     data = json.load(f)
                     self.settings = AppSettings(**data)
-                    if self.settings.was_connected:
-                        self.screen = AppScreen.DASHBOARD
+                    if self.settings.demo_mode:
+                        self.telemetry.dtcs = ["P0171", "P0300", "P0420"]
             except:
                 pass
 

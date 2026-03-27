@@ -6,8 +6,8 @@ from config import settings as C
 def draw_top_bar(screen, title, right_text, is_streaming, fonts):
     h = 40
     rect = pygame.Rect(0, 0, C.WIDTH, h)
-    pygame.draw.rect(screen, (15, 15, 15), rect)
-    pygame.draw.line(screen, (40, 40, 40), (0, h-1), (C.WIDTH, h-1), 1)
+    pygame.draw.rect(screen, C.BG, rect)
+    pygame.draw.line(screen, C.BORDER, (0, h-1), (C.WIDTH, h-1), 1)
     
     # Title - Aligned left, vertically centered
     t_surf = fonts.label.render(title, True, C.WHITE)
@@ -32,12 +32,12 @@ def draw_top_bar(screen, title, right_text, is_streaming, fonts):
         screen.blit(r_surf, (badge_rect.left + pad_x + 15, badge_rect.top + pad_y))
 
 def draw_tab_bar(screen, active_tab_index, fonts):
-    h = 50
+    h = 35
     y = C.HEIGHT - h
     rect = pygame.Rect(0, y, C.WIDTH, h)
-    pygame.draw.rect(screen, (10, 10, 10), rect)
+    pygame.draw.rect(screen, C.BG, rect)
     
-    tabs = ["DASHBOARD", "LOGS", "SETTINGS"]
+    tabs = ["DASHBOARD", "LOGS", "ERRORS", "SETTINGS"]
     tab_w = C.WIDTH // len(tabs)
     
     for i, tab in enumerate(tabs):
@@ -45,44 +45,48 @@ def draw_tab_bar(screen, active_tab_index, fonts):
         is_active = (i == active_tab_index)
         
         if is_active:
-            pygame.draw.rect(screen, (50, 50, 50), t_rect)
-            pygame.draw.line(screen, C.WHITE, (t_rect.left, t_rect.top), (t_rect.right, t_rect.top), 2)
+            pygame.draw.rect(screen, C.PANEL, t_rect)
+            pygame.draw.line(screen, C.CYAN, (t_rect.left, t_rect.top), (t_rect.right, t_rect.top), 2)
         else:
-            pygame.draw.rect(screen, (30, 30, 30), t_rect)
-            pygame.draw.line(screen, (20, 20, 20), (t_rect.right-1, t_rect.top), (t_rect.right-1, t_rect.bottom), 1)
+            pygame.draw.rect(screen, C.BG, t_rect)
+            pygame.draw.line(screen, C.BORDER, (t_rect.right-1, t_rect.top), (t_rect.right-1, t_rect.bottom), 1)
 
         # Draw icon
         icon_color = C.WHITE if is_active else C.DIM
-        icon_cx = t_rect.centerx
-        icon_cy = t_rect.top + 15
+        icon_cx = t_rect.centerx - 30
+        icon_cy = t_rect.centery
         
         if tab == "DASHBOARD":
             # 2x2 grid
             for dx in (-4, 2):
-                for dy in (-4, 2):
-                    pygame.draw.rect(screen, icon_color, (icon_cx + dx, icon_cy + dy, 4, 4))
+                for dy in (-3, 3):
+                    pygame.draw.rect(screen, icon_color, (icon_cx + dx, icon_cy + dy - 1, 3, 3))
         elif tab == "LOGS":
             # List
-            for dy in (-4, 0, 4):
-                pygame.draw.rect(screen, icon_color, (icon_cx - 6, icon_cy + dy, 3, 2))
-                pygame.draw.rect(screen, icon_color, (icon_cx - 1, icon_cy + dy, 8, 2))
+            for dy in (-3, 1, 5):
+                pygame.draw.rect(screen, icon_color, (icon_cx - 5, icon_cy + dy - 2, 2, 2))
+                pygame.draw.rect(screen, icon_color, (icon_cx - 1, icon_cy + dy - 2, 6, 2))
+        elif tab == "ERRORS":
+            # Exclamation mark
+            pygame.draw.rect(screen, icon_color, (icon_cx - 1, icon_cy - 4, 2, 5))
+            pygame.draw.rect(screen, icon_color, (icon_cx - 1, icon_cy + 3, 2, 2))
         elif tab == "SETTINGS":
             # Gear
-            pygame.draw.circle(screen, icon_color, (icon_cx, icon_cy), 4, 2)
-            for dy in (-5, 3):
+            pygame.draw.circle(screen, icon_color, (icon_cx, icon_cy), 3, 2)
+            for dy in (-4, 2):
                 pygame.draw.rect(screen, icon_color, (icon_cx - 1, icon_cy + dy, 2, 2))
-            for dx in (-5, 3):
+            for dx in (-4, 2):
                 pygame.draw.rect(screen, icon_color, (icon_cx + dx, icon_cy - 1, 2, 2))
 
         # Text
         color = C.WHITE if is_active else C.DIM
         t_surf = fonts.tiny.render(tab, True, color)
-        screen.blit(t_surf, (t_rect.centerx - t_surf.get_width() // 2, t_rect.bottom - 15))
+        screen.blit(t_surf, (t_rect.centerx - t_surf.get_width() // 2 + 10, t_rect.centery - t_surf.get_height() // 2))
 
 
 def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fonts, alert=False, progress_ratio=None):
     # Base card
-    pygame.draw.rect(screen, (25, 25, 25), rect)
+    pygame.draw.rect(screen, C.PANEL, rect)
     
     # Title
     t_surf = fonts.unit.render(title, True, C.DIM if not alert else C.ORANGE)
@@ -106,7 +110,7 @@ def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fon
         pygame.draw.circle(screen, C.DIM, (rect.right - 20, rect.top + 20), 6, 2)
     elif title == "COOLANT":
         icon_r = pygame.Rect(rect.right - 40, rect.top, 40, 40)
-        pygame.draw.rect(screen, (60, 20, 20), icon_r)
+        pygame.draw.rect(screen, (80, 20, 20), icon_r)
         cx, cy = icon_r.centerx, icon_r.centery
         pygame.draw.circle(screen, C.ORANGE, (cx, cy + 5), 4)
         pygame.draw.line(screen, C.ORANGE, (cx, cy + 5), (cx, cy - 8), 3)
@@ -116,7 +120,7 @@ def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fon
         bar_h = 6
         pad_x = 15
         bar_rect = pygame.Rect(rect.left + pad_x, rect.bottom - bar_h - 10, rect.width - pad_x * 2, bar_h)
-        pygame.draw.rect(screen, (40, 40, 40), bar_rect)
+        pygame.draw.rect(screen, C.BORDER, bar_rect)
         
         ratio = max(0.0, min(1.0, progress_ratio))
         fill_w = int(bar_rect.width * ratio)
@@ -127,7 +131,7 @@ def draw_card(screen, rect, title, value_str, unit_str, val_font, val_color, fon
             pygame.draw.rect(screen, bar_color, fill_rect)
 
 def draw_afr_full(screen, rect, afr, fonts):
-    pygame.draw.rect(screen, (25, 25, 25), rect)
+    pygame.draw.rect(screen, C.PANEL, rect)
     
     t_surf = fonts.unit.render("AIR/FUEL RATIO (AFR)", True, C.DIM)
     screen.blit(t_surf, (rect.left + 15, rect.top + 15))

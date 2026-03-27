@@ -11,6 +11,8 @@ from ui.screens.connection import ConnectionScreen
 from ui.screens.dashboard import DashboardScreen
 from ui.screens.logs import LogScreen
 from ui.screens.settings import SettingsScreen
+from ui.screens.loading import LoadingScreen
+from ui.screens.errors import ErrorsScreen
 
 def main():
     pygame.init()
@@ -21,17 +23,13 @@ def main():
     fonts = UIFonts.create()
     
     global_state.load()
-    if global_state.settings.was_connected:
-        from core.obd_client import obd_client
-        if not global_state.demo_mode:
-            obd_client.start(global_state.settings.ip, global_state.settings.port)
-        else:
-            global_state.connection_status = "connected"
 
     screens = {
         AppScreen.CONNECTION: ConnectionScreen(fonts),
+        AppScreen.LOADING: LoadingScreen(fonts),
         AppScreen.DASHBOARD: DashboardScreen(fonts),
         AppScreen.LOG: LogScreen(fonts),
+        AppScreen.ERRORS: ErrorsScreen(fonts),
         AppScreen.SETTINGS: SettingsScreen(fonts),
     }
 
@@ -53,6 +51,9 @@ def main():
         if global_state.screen == AppScreen.DASHBOARD:
             active_screen.update(dt)
             active_screen.draw(screen, fps)
+        elif global_state.screen == AppScreen.LOADING:
+            active_screen.update(dt)
+            active_screen.draw(screen)
         else:
             active_screen.draw(screen)
 

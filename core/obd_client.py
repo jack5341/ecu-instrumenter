@@ -170,7 +170,7 @@ class OBDClient:
         finally:
             if self._sock: self._sock.close()
             self._sock = None
-            if self._running:
+            if self._running and global_state.connection_status != "failed":
                 global_state.connection_status = "disconnected"
 
 obd_client = OBDClient()

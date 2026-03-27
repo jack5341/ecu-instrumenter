@@ -20,17 +20,19 @@ class IpInputWidget(Widget):
     def draw(self, surface, x, y, width, is_selected, fonts):
         from config import settings as C
         color = C.CYAN if is_selected else C.WHITE
-        lbl = fonts.label.render(self.label, True, C.DIM)
+        lbl = fonts.button.render(self.label, True, C.DIM)
         surface.blit(lbl, (x, y))
         
         val_x = x + 200
         for i, p in enumerate(self.parts):
             p_color = C.CYAN if (is_selected and self.selected_part == i) else color
-            txt = fonts.label.render(str(p), True, p_color)
+            txt = fonts.button.render(str(p), True, p_color)
             surface.blit(txt, (val_x, y))
+            if is_selected and self.selected_part == i:
+                pygame.draw.rect(surface, p_color, (val_x, y + 22, txt.get_width(), 3))
             val_x += txt.get_width()
             if i < 3:
-                dot = fonts.label.render(".", True, C.WHITE)
+                dot = fonts.button.render(".", True, C.WHITE)
                 surface.blit(dot, (val_x, y))
                 val_x += dot.get_width()
 
@@ -52,18 +54,34 @@ class PortInputWidget(Widget):
     def __init__(self, label, value):
         self.label = label
         self.value = value
+        self.parts = [int(p) for p in "%05d" % value]
+        self.selected_part = 4
 
     def draw(self, surface, x, y, width, is_selected, fonts):
         from config import settings as C
         color = C.CYAN if is_selected else C.WHITE
-        lbl = fonts.label.render(self.label, True, C.DIM)
+        lbl = fonts.button.render(self.label, True, C.DIM)
         surface.blit(lbl, (x, y))
-        val = fonts.label.render(str(self.value), True, color)
-        surface.blit(val, (x + 200, y))
+        
+        val_x = x + 200
+        for i, p in enumerate(self.parts):
+            p_color = C.CYAN if (is_selected and self.selected_part == i) else color
+            txt = fonts.button.render(str(p), True, p_color)
+            surface.blit(txt, (val_x, y))
+            if is_selected and self.selected_part == i:
+                pygame.draw.rect(surface, p_color, (val_x, y + 22, txt.get_width(), 3))
+            val_x += txt.get_width() + 2
 
-    def handle_left(self): self.value = max(0, self.value - 1)
-    def handle_right(self): self.value = min(65535, self.value + 1)
-    def handle_click(self): self.value += 100 # Quick jump
+    def handle_left(self): 
+        self.parts[self.selected_part] = (self.parts[self.selected_part] - 1) % 10
+        self.value = int("".join([str(p) for p in self.parts]))
+        
+    def handle_right(self): 
+        self.parts[self.selected_part] = (self.parts[self.selected_part] + 1) % 10
+        self.value = int("".join([str(p) for p in self.parts]))
+        
+    def handle_click(self): 
+        self.selected_part = (self.selected_part + 1) % 5
 
 class ToggleWidget(Widget):
     def __init__(self, label, value):
@@ -73,9 +91,9 @@ class ToggleWidget(Widget):
     def draw(self, surface, x, y, width, is_selected, fonts):
         from config import settings as C
         color = C.CYAN if is_selected else C.WHITE
-        lbl = fonts.label.render(self.label, True, C.DIM)
+        lbl = fonts.button.render(self.label, True, C.DIM)
         surface.blit(lbl, (x, y))
-        val = fonts.label.render("ON" if self.value else "OFF", True, color)
+        val = fonts.button.render("ON" if self.value else "OFF", True, color)
         surface.blit(val, (x + 200, y))
 
     def handle_left(self): self.value = not self.value
@@ -92,18 +110,18 @@ class SliderWidget(Widget):
     def draw(self, surface, x, y, width, is_selected, fonts):
         from config import settings as C
         color = C.CYAN if is_selected else C.WHITE
-        lbl = fonts.label.render(self.label, True, C.DIM)
+        lbl = fonts.button.render(self.label, True, C.DIM)
         surface.blit(lbl, (x, y))
         
         bar_x = x + 180
         bar_w = width - 240
-        pygame.draw.rect(surface, (40, 50, 60), (bar_x, y + 15, bar_w, 4))
+        pygame.draw.rect(surface, C.BORDER, (bar_x, y + 15, bar_w, 4))
         
         ratio = float(self.value - self.min_val) / max(1, self.max_val - self.min_val)
         knob_x = bar_x + int(ratio * bar_w)
         pygame.draw.circle(surface, color, (knob_x, y + 17), 10)
         
-        val_txt = fonts.label.render(str(self.value), True, color)
+        val_txt = fonts.button.render(str(self.value), True, color)
         surface.blit(val_txt, (bar_x + bar_w + 15, y))
 
     def handle_left(self): self.value = max(self.min_val, self.value - 5)
@@ -117,11 +135,16 @@ class ButtonWidget(Widget):
     def draw(self, surface, x, y, width, is_selected, fonts):
         from config import settings as C
         border_color = C.CYAN if is_selected else C.BORDER
-        bg_color = (30, 40, 60) if is_selected else C.PANEL
+        bg_color = C.CYAN if is_selected else C.PANEL
         rect = pygame.Rect(x, y, width, 40)
         pygame.draw.rect(surface, bg_color, rect)
         pygame.draw.rect(surface, border_color, rect, 2)
-        txt = fonts.label.render(self.label, True, C.WHITE)
+        
+        text_color = C.WHITE
+        if is_selected:
+            text_color = C.WHITE
+            
+        txt = fonts.button.render(self.label, True, text_color)
         surface.blit(txt, (x + width//2 - txt.get_width()//2, y + 20 - txt.get_height()//2))
 
     def handle_click(self):

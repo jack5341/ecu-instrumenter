@@ -15,7 +15,7 @@ class LogScreen:
         
         surface.fill(C.BG)
         # Top bar
-        draw_top_bar(surface, "SYSTEM LOGS", "STREAMING", True, self.fonts)
+        draw_top_bar(surface, "SYSTEM LOGS", "", False, self.fonts)
         
         # Backup instruction / shortcut hints
         hint = "[X] to Backup Logs  |  [Y] to Clear"
@@ -84,7 +84,7 @@ class LogScreen:
             elif event.key == pygame.K_LEFT:
                 global_state.screen = AppScreen.DASHBOARD
             elif event.key == pygame.K_RIGHT:
-                global_state.screen = AppScreen.SETTINGS
+                global_state.screen = AppScreen.ERRORS
 
     def _export_log(self):
         try:
