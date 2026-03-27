@@ -12,20 +12,12 @@ run:
 	python3 app.py
 
 deploy:
-	@echo "Checking for uncommitted changes..."
-	@if [ -n "$$(git status --porcelain)" ]; then \
-		echo "ERROR: You have uncommitted changes. Please commit first!"; \
-		exit 1; \
-	fi
-	@echo "Pushing changes to remote repository..."
-	@git push
-	@echo "Syncing via Git on Miyoo Mini..."
-	@ssh root@$(MIYOO_IP) " \
-		if [ ! -d '/mnt/SDCARD/App/ECUInstrumenter/.git' ]; then \
-			echo 'Repository not found. Cloning for the first time...'; \
-			cd /mnt/SDCARD/App && git clone https://github.com/jack5341/ecu-instrumenter.git ECUInstrumenter; \
-		else \
-			cd /mnt/SDCARD/App/ECUInstrumenter && git pull origin main; \
-		fi && \
-		find /mnt/SDCARD/App/ECUInstrumenter -name '*.pyc' -delete"
+	@echo "Syncing application to Miyoo Mini using rsync..."
+	@mkdir -p ./ECUInstrumenter
+	@cp __init__.py app.py config.json settings.json launch.sh ./ECUInstrumenter/ 2>/dev/null || :
+	@cp -R assets config core models sim ui ./ECUInstrumenter/
+	@find ./ECUInstrumenter -name "*.pyc" -delete 2>/dev/null || :
+	@rsync -rtvzc --progress ./ECUInstrumenter/ root@$(MIYOO_IP):/mnt/SDCARD/App/ECUInstrumenter/
+	@ssh root@$(MIYOO_IP) "find /mnt/SDCARD/App/ECUInstrumenter -name '*.pyc' -delete" 2>/dev/null || :
+	@rm -rf ./ECUInstrumenter
 	@echo "\nDeployment complete! You can launch 'ECU Instrumenter' on your Miyoo Mini now."
