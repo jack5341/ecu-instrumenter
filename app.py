@@ -3,6 +3,10 @@
 from __future__ import division
 import sys
 import pygame
+import logging
+
+# Suppress harmless missing hashlib warnings on the Miyoo Python 2.7 build
+logging.getLogger().setLevel(logging.CRITICAL)
 
 from config import settings as C
 from core.state import global_state, AppScreen

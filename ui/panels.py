@@ -150,7 +150,7 @@ def draw_afr_full(screen, rect, afr, fonts):
         val_color = C.WHITE
 
     v_surf = fonts.huge.render("{0:.1f}".format(afr), True, val_color)
-    screen.blit(v_surf, (rect.left + 15, rect.bottom - 15 - v_surf.get_height()))
+    screen.blit(v_surf, (rect.left + 15, rect.top + 42))
     
     # Badge right
     b_surf = fonts.unit.render(badge_text, True, badge_color)

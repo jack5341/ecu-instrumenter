@@ -106,7 +106,7 @@ class DashboardScreen:
 
         # Row 3
         r3_y = r2_y + r2_h + gap
-        r3_h = 90
+        r3_h = C.HEIGHT - r3_y - C.PAD - 35 # Fill the gap to the tab bar (35 is tab bar height)
         afr_rect = pygame.Rect(p, r3_y, w_total, r3_h)
         draw_afr_full(surface, afr_rect, t.afr, self.fonts)
         
